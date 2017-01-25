@@ -1,0 +1,549 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>KG 125th PM</title>
+  <style type="text/css">
+body{
+	background-color: black;
+}
+*{
+  font-size:50px;
+  margin:0;
+  padding:0;
+  -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+         -o-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+            box-sizing: border-box;
+}
+#banner{
+	position:absolute;
+	top: 0px;
+	width: 100%;
+	height: 50px;
+	background: #1e3c91;
+	margin: 0;
+}
+#msg_list{
+	position:absolute;
+	width: 100%;
+	height: 250px;
+	top: 260px;
+	background: black;
+	margin: 0;
+	padding-left: 10px;
+	overflow:auto;
+}
+#banner{
+	margin: 0px;
+	padding:0px;
+}
+#mission{
+	position:absolute;
+	width: 96%;
+	height: 160px;
+	top: 50px;
+	margin: 0;
+	
+	background-color:#ddeeff;
+    margin:20px;
+    padding:5px;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    box-shadow:0px 0px 10px 10px #aedaf2;
+    -moz-box-shadow:0px 0px 10px 10px #aedaf2;
+    -webkit-box-shadow:0px 0px 10px 10px #aedaf2;
+}
+#message{
+	position:absolute;
+	top: 520px;
+	margin-left: 10px;
+	margin-top: 10px;
+	width:98%;
+	padding:10px;
+	border:0;
+	border:solid 1px #ccc;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+#under{
+	position:relative;
+	width: 100%;
+	overflow:auto;
+	border-bottom:3px solid #00bfff;
+}
+input[type=submit] {
+	position:absolute;
+	top:630px;
+	left:10px;
+	width:200px;
+	height:100px;
+	border-top: 1px solid #ccc;
+	border-right: 1px solid #999;
+	border-bottom: 1px solid #999;
+	border-left: 1px solid #ccc;
+	padding: 5px 20px;
+	font-weight: bold;
+	font-size:60px;
+	cursor: pointer;
+	color: #666;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	text-shadow: 0 -1px 1px #FFF, -1px 0 1px #FFF, 1px 0 1px #aaa;
+	background: -moz-linear-gradient(top, #fff, #F1F1F1 1%, #F1F1F1 50%, #DFDFDF 99%, #ccc);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(0.01, #F1F1F1), color-stop(0.5, #F1F1F1), color-stop(0.99, #DFDFDF), to(#ccc));
+	-moz-box-shadow: 1px 1px 2px #E7E7E7;
+	-webkit-box-shadow: 1px 1px 2px #E7E7E7;
+}
+.input[type=submit]:hover{
+	background: -moz-linear-gradient(top, #fff, #e1e1e1 1%, #e1e1e1 50%, #cfcfcf 99%, #ccc);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(0.01, #e1e1e1), color-stop(0.5, #e1e1e1), color-stop(0.99, #cfcfcf), to(#ccc));
+}
+nput[type=submit]:active{
+	background: #ccc;
+	padding: 6px 20px 4px;
+}
+
+#canvasContainer {
+	width: 100%;
+	height: 100%;
+	background: black;
+	margin: 0;
+}
+#txt1{
+	font-weight: bold; 
+}
+#txt2{
+	margin-top:3px;
+}
+#wordcount_{
+	position:absolute;
+	top: 690px;
+	left: 250px;
+	color: #ffffff;
+	font-size:30px;
+}
+canvas { top: 0; left: 0;  position: absolute;}
+
+</style>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+
+  //*/
+  var s = io.connect('http://49.212.231.148:3300/'); //リモート
+  var s0 = io.connect('http://49.212.231.148:3330/'); 
+  /*/
+  var s = io.connect('http://localhost:3000'); //ローカル
+  //*/
+
+  var r = Math.floor(Math.random() * 155)+100;
+  var g = Math.floor(Math.random() * 155)+100;
+  var b = Math.floor(Math.random() * 155)+100;
+  var c = "#"+r.toString(16)+g.toString(16)+b.toString(16);
+  //var c = '#'+Math.random().toString(16).slice(-6); // 色生成
+  //alert(c);
+  var sz = Math.floor(Math.random() * 15) + 19; // サイズ
+  
+  var tapcount=0;
+  
+  var mouseX=0,mouseY=0;
+  
+  var smartphone=false;
+  var count=Math.floor(Math.random() * 300)-150;
+  var tapcheck=true;
+  var wordlength=0;
+  
+  
+  function test(val) {
+	var badWords = ["エッチ","陰毛","いんもう","まんこ","ま○こ","まんk","マソコ","オメコ","ヴァギナ","クリトリス","ちんこ","ちんk","ちんちん","チンポ","ペニス","きんたま","肉棒","勃起","ボッキ","精子","射精","ザーメン","●～","○～","セックス","SEX","S○X","体位","淫乱","アナル","おっぱい","oppai","おっぱお","巨乳","きょにゅう","きょにゅー","貧乳","ひんにゅう","ひんにゅー","谷間","たにま","何カップ","なにカップ","手ブラ","てブラ","パンツ","パンティ","パンt","ノーパン","乳首","ちくび","自慰","オナニ","オナ二","オナヌ","マスターベーション","しこって","しこしこ","脱げ","ぬげ","脱いで","ぬいで","喘いで","あえいで","クンニ","フェラ","まんぐり","パイズリ","風俗","ふうぞく","ふーぞく","ソープ","デリヘル","ヘルス","姦","包茎","ほうけい","童貞","どうてい","どうてー","どーてー","性器","処女","やりまん","乱交","バイブ","ローター","パイパン","中出し","中田氏","スカトロ","糞","うんこ","うんち","パコパコ","ホモ","homo","ぱいぱい","ノーブラ","きめえ","変態","馬鹿","ばーか","baka","fuck","f*ck","ファック","不細工","ぶさいく","ブス","かす","基地外","気違い","ブタ","くたばれ","潰せ","bitch","ビッチ","死す","死な","死ぬ","しぬ","死ね","しね","氏ね","shine","死の","死ん","ﾀﾋ","殺さ","殺し","殺す","ころす","殺せ","ころせ","殺そ","乞食","ばばあ","ばばぁ","BBA","くず","麻薬","レイプ","犯し"]; //禁止文字の配列
+	var regex = new RegExp(badWords.join("|")); //正規表現オブジェクト
+	//console.log(val.match(regex));
+	if (val.match(regex) != null) {
+		//console.log("禁止文字が含まれています");
+	return false;
+	}
+	return true;
+  }
+  
+
+window.onload = function(){
+  var canvas = document.getElementById("canvas");
+  var ctx1 = canvas.getContext("2d");
+  if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || (navigator.userAgent.indexOf('Android') > 0 && navigator.userAgent.indexOf('Mobile') > 0)) {
+		smartphone=true;
+	}
+
+	document.bgColor = "black";
+	
+	// ページ読込時にCanvasサイズ設定 
+	setCanvasSize();
+	
+	// Canvasサイズをコンテナの100%に 
+	function setCanvasSize() {
+	canvas.width = window.innerWidth;
+	canvas.height = 550;
+	}
+	
+	hyoji1(0);
+	/*
+	ctx1.fillStyle="white";
+	ctx1.beginPath();
+	ctx1.arc((canvas.width/2), 275, 250, 0, Math.PI*2, true);
+	ctx1.fill();
+	*/
+	
+	setInterval(function(){
+			 //console.log(mouseX+","+mouseY);
+			//console.log(count);
+			count++;
+			if(count>=330){
+				if(tapcheck==true){
+					tapcheck=false;
+				}
+			}
+			//console.log(count+","+tapcheck); 
+			draw1(ctx1);
+		},33
+	);
+	
+	
+	
+	draw1(ctx1);
+	canvas.onmousedown = mouseDownListner;
+	
+	
+	function adjustXY(e) {
+		var rect = e.target.getBoundingClientRect();
+		mouseX = e.clientX - rect.left;
+		mouseY = e.clientY - rect.top;
+	}
+	
+	//スマホ、pcの判定
+	if(smartphone==false){
+		canvas.onmousedown = mouseDownListner;
+		function mouseDownListner(e) {
+			//座標調整
+			adjustXY(e);
+			//console.log(mouseX+","+mouseY);
+			if(mouseX>(canvas.width/2)-250&&mouseX<(canvas.width/2)-250+500&&mouseY>25&&mouseY&&25+500){
+				draw2(ctx1);
+				if(tapcheck==false){
+					tapcheck=true;
+					count=0;
+					sendMessage2();
+				}
+			}
+			
+		}
+	}else{
+	$(function(){
+		var box = $("#canvasContainer")[0];
+		box.addEventListener("touchstart", touchHandler, false);
+		box.addEventListener("touchmove", touchHandler, false);
+		box.addEventListener("touchend", touchHandler, false);
+	});
+	
+	}
+	function touchHandler(e){
+		e.preventDefault();
+		var touch = e.touches[0];
+		if(e.type == "touchstart"){
+			mouseX=touch.pageX;
+			mouseY=touch.pageY;
+			if(mouseX>(canvas.width/2)-250&&mouseX<(canvas.width/2)-250+500&&mouseY>25&&mouseY&&25+500){
+				draw2(ctx1);
+				if(tapcheck==false){
+					tapcheck=true;
+					count=0;
+					sendMessage2();
+				}
+			}
+			
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+}
+
+function mouseDownListner(e) {
+		//座標調整
+		adjustXY(e);
+		//テキストの描画
+		/*
+		ctx.globalAlpha = 1;
+		ctx.fillStyle = "#666666";
+		ctx.fillText("X座標：" + mouseX, 5, 12);
+		ctx.fillText("Y座標：" + mouseY, 5, 24);
+		*/
+}
+function adjustXY(e) {
+		var rect = e.target.getBoundingClientRect();
+		mouseX = e.clientX - rect.left;
+		mouseY = e.clientY - rect.top;
+}
+	
+
+function draw1(context){
+	var x=(canvas.width/2)-250,y=25,w=500;r=50;
+	
+	context.save();
+	context.clearRect(0, 0, canvas.width,canvas.height);
+	context.strokeStyle = 'rgb(00,50,255)'; //枠線の色は青
+	context.fillStyle = 'rgb(00,00,00)';
+	context.save();
+	//角丸四角形を描く
+	context.beginPath();
+	context.arc(x+w-r, y+w-r, r, 0 * Math.PI / 180, 90 * Math.PI / 180, false);
+	context.lineTo(x+30, y+w);
+	context.arc(x+r, y+w-r, r, 90 * Math.PI / 180, 180 * Math.PI / 180, false);
+	context.lineTo(x, y+r);
+	context.arc(x+r, y+r, r, 180 * Math.PI / 180, 270 * Math.PI / 180, false);
+	context.lineTo(x+w-r, y);
+	context.arc(x+w-r, y+r, r, 270 * Math.PI / 180, 360 * Math.PI / 180, false);
+	context.lineTo(x+w, y+w-r);
+	context.closePath();
+	context.lineWidth = 3;
+	context.shadowBlur   = 5;
+	context.shadowColor = '#003377';
+	context.shadowOffsetX = 3;
+	context.shadowOffsetY = 3;
+	context.fill();
+	context.stroke();
+	//グラデーション
+	var grad  = context.createLinearGradient(0,0, 0,y+w+10);
+	//グラデーション終点のオフセットと色をセット
+	grad.addColorStop(0,'rgb(00,200,255)');
+	grad.addColorStop(0.5,'rgb(00,150,255)');
+	grad.addColorStop(1,'rgb(00,100,255)');
+	//グラデーションをfillStyleプロパティにセット
+	context.fillStyle = grad;
+	context.fill();
+	context.restore();
+	context.save();
+	context.clip();
+	context.scale(1, 0.5);
+	context.fillStyle = 'rgba(255,255,255,0.2)';
+	context.beginPath();
+	context.arc(x+(w/2), 250, 320, 0, Math.PI*2, false);
+	context.closePath();
+	context.shadowBlur   = 0;
+	context.shadowColor = '#FFFFFF';
+	context.shadowOffsetX = 0;
+	context.shadowOffsetY = 0;
+	context.fill();
+	context.restore();
+	context.save();
+	
+	context.font = "120pt sans-serif";
+	context.fillStyle = "rgba(255, 255, 255,1)";
+	context.shadowColor = "rgba(0, 0, 0, 1)";  
+	context.shadowBlur  = 20;
+	context.fillText("Tap!!", (canvas.width/2)-250+65,330);
+	context.shadowBlur  = 0;      //ぼかしを０にする
+
+}
+function draw2(context){
+	var x=(canvas.width/2)-250,y=25,w=500;r=50;
+	
+	context.save();
+	context.clearRect(0, 0, canvas.width,canvas.height);
+	context.strokeStyle = 'rgb(255,50,00)'; //枠線の色は青
+	context.fillStyle = 'rgb(00,00,00)';
+	context.save();
+	//角丸四角形を描く
+	context.beginPath();
+	context.arc(x+w-r, y+w-r, r, 0 * Math.PI / 180, 90 * Math.PI / 180, false);
+	context.lineTo(x+30, y+w);
+	context.arc(x+r, y+w-r, r, 90 * Math.PI / 180, 180 * Math.PI / 180, false);
+	context.lineTo(x, y+r);
+	context.arc(x+r, y+r, r, 180 * Math.PI / 180, 270 * Math.PI / 180, false);
+	context.lineTo(x+w-r, y);
+	context.arc(x+w-r, y+r, r, 270 * Math.PI / 180, 360 * Math.PI / 180, false);
+	context.lineTo(x+w, y+w-r);
+	context.closePath();
+	context.lineWidth = 3;
+	context.shadowBlur   = 5;
+	context.shadowColor = '#773300';
+	context.shadowOffsetX = 3;
+	context.shadowOffsetY = 3;
+	context.fill();
+	context.stroke();
+	//グラデーション
+	var grad  = context.createLinearGradient(0,0, 0,y+w+10);
+	//グラデーション終点のオフセットと色をセット
+	grad.addColorStop(0,'rgb(255,200,00)');
+	grad.addColorStop(0.5,'rgb(255,150,00)');
+	grad.addColorStop(1,'rgb(255,100,00)');
+	//グラデーションをfillStyleプロパティにセット
+	context.fillStyle = grad;
+	context.fill();
+	context.restore();
+	context.save();
+	context.clip();
+	context.scale(1, 0.5);
+	context.fillStyle = 'rgba(255,255,255,0.2)';
+	context.beginPath();
+	context.arc(x+(w/2), 250, 320, 0, Math.PI*2, false);
+	context.closePath();
+	context.shadowBlur   = 0;
+	context.shadowColor = '#FFFFFF';
+	context.shadowOffsetX = 0;
+	context.shadowOffsetY = 0;
+	context.fill();
+	context.restore();
+	context.save();
+}
+
+
+document.onkeydown = function (e){
+	// InternetExplorer 用
+	if (!e)	e = window.event;
+	// 出力テスト
+	//console.log(e.which);
+	/*
+	//'p'
+	if(e.which==80){
+		hyoji1(1);
+	}
+	//'s'
+	if(e.which==83){
+		hyoji1(0);
+		
+	}
+	//'c'
+	if(e.which==67){
+		sendMessage2();
+	}
+	*/
+};
+
+  //サーバから受け取るイベント
+  s0.on("connect", function (data) {
+	  //addMessage(" "+data.value,"#FFFFFF","20");
+  });  // 接続時
+  s0.on("disconnect", function (client) {});  // 切断時
+  s0.on("S_to_C_message", function (data) {
+    //console.log("hoge");
+	//console.log(data.changeworld);
+    //saddMessage(" "+data.changeworld+"written by server!!","#FFFFFF","20");
+	
+	if(data.changeworld==1111){
+		//tapモード
+		hyoji1(1);
+		document.getElementById("txt1").innerHTML="MISSION 2";
+		document.getElementById("txt2").innerHTML="みんなのオモイを時計台に届けよう！";
+	}else if(data.changeworld==9999){
+		//voiceモード
+		hyoji1(0);
+		document.getElementById("txt1").innerHTML="MISSION 1";
+		document.getElementById("txt2").innerHTML="時計台にオモイをおくろう！";
+	}else if(data.changeworld==5555){
+		hyoji1(2);
+		document.getElementById("txt1").innerHTML="ご参加ありがとうございました！";
+		document.getElementById("txt2").innerHTML='<a href="http://urx2.nu/fnOb">アンケートにご協力ください。</a>';
+	}
+	//hyoji1(1);
+	
+  });
+
+  //クライアントからイベント送信（イベント名は自由に設定できます）
+  function sendMessage() {
+  if(wordlength<=30){
+		var msg = $("#message").val(); //取得
+		$("#message").val(""); //空白にする
+		if(msg!=""){
+			var ngword=test(msg);
+			if(ngword==true){
+				s.emit("C_to_S_message", {value:msg,color:c,size:sz}); //サーバへ送信
+				addMessage(msg,c,sz);
+			}
+		}
+	}
+  }
+  
+  //クライアントからイベント送信テスト
+  function sendMessage3() {
+	s.emit("C_to_S_message", {value:c,color:c,size:sz}); //サーバへ送信
+	addMessage(c,c,sz);
+  }
+  
+  //クライアントからタッチイベント送信
+  function sendMessage2() {
+	s.emit("C_to_S_message", {value:tapcount}); //サーバへ送信
+	//addMessage(c,c,sz);
+	tapcount++;
+  }
+
+
+  //jqueryでメッセージを追加
+  function addMessage (value,color,size) {
+    console.log(color);
+    var msg = value.replace( /[!@$%<>'"&|]/g, '' ); //タグ記号とかいくつか削除
+    $("#msg_list").prepend("<div class='msg' style='color:" + color + "; font-size:40px'>" + msg + "</div>");
+  }
+  
+  function hyoji1(num){
+  if (num == 0){
+    document.getElementById("disp").style.display="block";
+	document.getElementById("canvasContainer").style.display="none";
+  }else if(num==1){
+    document.getElementById("disp").style.display="none";
+	document.getElementById("canvasContainer").style.display="block";
+  }else if(num==2){
+    document.getElementById("disp").style.display="none";
+	document.getElementById("canvasContainer").style.display="none";
+  }
+}
+function ShowLength( str ) {
+	wordlength=str.length;
+	if(wordlength<=30){
+		document.getElementById("wordcount_").innerHTML = '<font color="white" style="font-size: 30px;">'+(30-str.length)+"</font>";
+	}else{
+		document.getElementById("wordcount_").innerHTML = '<font color="red" style="font-size: 30px;"">'+(30-str.length)+"</font>";
+	}
+	//$("#wordcount_").prepend(""+str.legth:);
+}
+
+
+  </script>
+  <style>
+  </style>
+</head>
+<body>
+<div id="banner" class="relative">
+	<div align="center">
+		<img src="http://59.106.221.135/125pm/combi1_e.png" width="304" height="50" alt="">
+	</div>
+</div>
+  <div id="mission">
+	  <div id="under">
+		  <center><div id="txt1">MISSION 1</div></center>
+	  </div>
+	  <center><div id="txt2">時計台にオモイをおくろう！</div></center>
+  </div>
+
+<div id="disp">
+  <div id="msg_list"></div>
+  <form action="" method="post" onsubmit="return false;">
+  <input type="textarea" class="textarea"  id="message" onkeyup="ShowLength(value);">
+  <input type="submit" name="submit" onclick="sendMessage();" value="送信!">
+  <div id="wordcount_">30</div>
+  </form>
+</div>
+
+<div id="canvasContainer" class="relative">
+<canvas id="canvas"style="top:260px;left:0px;"></canvas>
+</div>
+
+</body>
+</html>
+

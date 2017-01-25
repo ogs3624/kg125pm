@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>node.js chat</title>
+  <style type="text/css">
+*{
+  font-size:30px;
+  margin:0;
+  padding:0;
+  -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+         -o-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+            box-sizing: border-box;
+}
+#banner{
+	position:absolute;
+	top: 0px;
+	width: 100%;
+	height: 50px;
+	background: blue;
+	margin: 0;
+}
+#msg_list{
+	position:absolute;
+	width: 100%;
+	height: 250px;
+	top: 200px;
+	background: black;
+	margin: 0;
+	padding-left: 10px;
+	overflow:auto;
+}
+#banner{
+	margin: 0px;
+	padding:0px;
+}
+#mission{
+	position:absolute;
+	width: 96%;
+	height: 115px;
+	top: 50px;
+	background: green;
+	margin: 0;
+	
+	background-color:#ddeeff;
+    margin:20px;
+    padding:5px;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    box-shadow:0px 0px 10px 10px #aedaf2;
+    -moz-box-shadow:0px 0px 10px 10px #aedaf2;
+    -webkit-box-shadow:0px 0px 10px 10px #aedaf2;
+}
+#message{
+	position:absolute;
+	top: 450px;
+	margin-left: 10px;
+	margin-top: 10px;
+	width:98%;
+	padding:10px;
+	border:0;
+	border:solid 1px #ccc;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+#under{
+	position:relative;
+	width: 100%;
+	overflow:auto;
+	border-bottom:1px solid #00bfff;
+}
+input[type=submit] {
+	position:absolute;
+	top:530px;
+	left:10px;
+	border-top: 1px solid #ccc;
+	border-right: 1px solid #999;
+	border-bottom: 1px solid #999;
+	border-left: 1px solid #ccc;
+	padding: 5px 20px;
+	font-weight: bold;
+	cursor: pointer;
+	color: #666;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	text-shadow: 0 -1px 1px #FFF, -1px 0 1px #FFF, 1px 0 1px #aaa;
+	background: -moz-linear-gradient(top, #fff, #F1F1F1 1%, #F1F1F1 50%, #DFDFDF 99%, #ccc);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(0.01, #F1F1F1), color-stop(0.5, #F1F1F1), color-stop(0.99, #DFDFDF), to(#ccc));
+	-moz-box-shadow: 1px 1px 2px #E7E7E7;
+	-webkit-box-shadow: 1px 1px 2px #E7E7E7;
+}
+.input[type=submit]:hover{
+	background: -moz-linear-gradient(top, #fff, #e1e1e1 1%, #e1e1e1 50%, #cfcfcf 99%, #ccc);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(0.01, #e1e1e1), color-stop(0.5, #e1e1e1), color-stop(0.99, #cfcfcf), to(#ccc));
+}
+nput[type=submit]:active{
+	background: #ccc;
+	padding: 6px 20px 4px;
+}
+
+</style>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+
+  //*/
+  var s = io.connect('http://49.212.231.148:3300/'); //リモート
+  var s0 = io.connect('http://49.212.231.148:3330/'); 
+  /*/
+  var s = io.connect('http://localhost:3000'); //ローカル
+  //*/
+
+  var r = Math.floor(Math.random() * 100)+155;
+  var g = Math.floor(Math.random() * 100)+155;
+  var b = Math.floor(Math.random() * 100)+155;
+  var c = "#"+r.toString(16)+g.toString(16)+b.toString(16);
+  //var c = '#'+Math.random().toString(16).slice(-6); // 色生成
+  //alert(c);
+  var sz = Math.floor(Math.random() * 16) + 16; // サイズ
+  
+  var tapcount=0;
+  
+
+window.onload = function(){
+	document.bgColor = "black";
+}
+document.onkeydown = function (e){
+	// InternetExplorer 用
+	if (!e)	e = window.event;
+	// 出力テスト
+	//console.log(e.which);
+	//'p'
+	if(e.which==80){
+		hyoji1(1);
+	}
+	//'s'
+	if(e.which==83){
+		hyoji1(0);
+		
+	}
+	//'c'
+	if(e.which==67){
+		sendMessage2();
+	}
+};
+
+  //サーバから受け取るイベント
+  s0.on("connect", function (data) {
+	  //addMessage(" "+data.value,"#FFFFFF","20");
+  });  // 接続時
+  s0.on("disconnect", function (client) {});  // 切断時
+  s0.on("S_to_C_message", function (data) {
+    //console.log("hoge");
+	//console.log(data.changeworld);
+    addMessage(" "+data.changeworld+"written by server!!","#FFFFFF","20");
+	//hyoji1(1);
+	
+	/*
+	if(data.changeworld==9999){
+		console.log("hoge");
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+		sendMessage3();
+	}
+	*/
+  });
+
+  //クライアントからイベント送信（イベント名は自由に設定できます）
+  function sendMessage() {
+    var msg = $("#message").val(); //取得
+    $("#message").val(""); //空白にする
+	if(msg!=""){
+		s.emit("C_to_S_message", {value:msg,color:c,size:sz}); //サーバへ送信
+		addMessage(msg,c,sz);
+	}
+	
+  }
+  
+  //クライアントからイベント送信テスト
+  function sendMessage3() {
+	s.emit("C_to_S_message", {value:c,color:c,size:sz}); //サーバへ送信
+	addMessage(c,c,sz);
+  }
+  
+  //クライアントからタッチイベント送信
+  function sendMessage2() {
+	s.emit("C_to_S_message", {value:tapcount}); //サーバへ送信
+	//addMessage(c,c,sz);
+	tapcount++;
+  }
+
+
+  //jqueryでメッセージを追加
+  function addMessage (value,color,size) {
+    console.log(color);
+    var msg = value.replace( /[!@$%<>'"&|]/g, '' ); //タグ記号とかいくつか削除
+    $("#msg_list").prepend("<div class='msg' style='color:" + color + "; font-size:"+size+"px'>" + msg + "</div>");
+  }
+  
+  function hyoji1(num){
+  if (num == 0){
+    document.getElementById("disp").style.display="block";
+  }else{
+    document.getElementById("disp").style.display="none";
+  }
+}
+
+  </script>
+  <style>
+  </style>
+</head>
+<body>
+<div id="banner" class="relative"></div>
+  <div id="mission">
+	  <div id="under">
+	    <center>MISSION 1</center>
+	  </div>
+	わーい
+  </div>
+<div id="disp">
+  <div id="msg_list"></div>
+  <form action="" method="post" onsubmit="return false;">
+  <input type="textarea" class="textarea"  id="message"/>
+  <input type="submit" name="submit" onclick="sendMessage();" value="送信!">
+</div>
+  </form>
+</div>
+</body>
+</html>
+

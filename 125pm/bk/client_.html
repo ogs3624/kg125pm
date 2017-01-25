@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>node.js chat</title>
+  <style type="text/css">
+html, body { width:100%; height:100%; top: 0; left: 0;}
+#canvasContainer { width:100%; height:100%;  top: 0; left: 0; position: fixed;}
+canvas { display:block;  top: 0; left: 0; position: fixed;}
+</style>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+  
+	
+	var mouseX=0;
+	var mouseY=0;
+	
+	//var ipAddress_=ipAddress+"/"+port;
+	//alert(ipAddress_);
+	
+	var smartphone=false;
+	
+window.addEventListener( "load", function() {
+	var container = document.getElementById("canvasContainer"),
+	canvas1 = document.getElementById("canvas"),
+	queue = null,
+	wait = 300;
+	var ctx1 = canvas1.getContext("2d");
+	
+	var canvas = document.getElementById("canvas");
+	var context = canvas.getContext("2d"); 
+	
+	var mouse_status=false;
+	
+	if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || (navigator.userAgent.indexOf('Android') > 0 && navigator.userAgent.indexOf('Mobile') > 0)) {
+		smartphone=true;
+	}
+	
+	
+	
+	// ページ読込時にCanvasサイズ設定 
+	setCanvasSize();
+	
+	 
+	// リサイズ時にCanvasサイズを再設定 
+	window.addEventListener("resize", function() {
+	clearTimeout( queue );
+	queue = setTimeout(function() {
+	setCanvasSize();
+	}, wait );
+	}, false );
+	 
+	// Canvasサイズをコンテナの100%に 
+	function setCanvasSize() {
+	canvas1.width = container.offsetWidth;
+	canvas1.height = container.offsetHeight;
+	}
+	
+	function adjustXY(e) {
+		var rect = e.target.getBoundingClientRect();
+		mouseX = e.clientX - rect.left;
+		mouseY = e.clientY - rect.top;
+	}
+	
+	//スマホ、pcの判定
+	if(smartphone==false){
+		canvas.onmousemove = mouseMoveListner;
+		function mouseMoveListner(e) {
+			//座標調整
+			adjustXY(e);
+			//テキストの描画
+			/*
+			ctx.globalAlpha = 1;
+			ctx.fillStyle = "#666666";
+			ctx.fillText("X座標：" + mouseX, 5, 12);
+			ctx.fillText("Y座標：" + mouseY, 5, 24);
+			*/
+		}
+		canvas.onmouseout=function() {
+			/*
+			mouseX=0;
+			mouseY=0;
+			*/
+		};
+		canvas.onmousedown=function() {
+			//sendMessage();
+			mouse_status=true;
+			
+		};
+		canvas.onmouseup=function() {
+			//sendMessage();
+			/*
+			mouseX=0;
+			mouseY=0;
+			sendMessage();
+			mouse_status=false;
+			*/
+		};
+	}else{
+	$(function(){
+		var box = $("#canvasContainer")[0];
+		box.addEventListener("touchstart", touchHandler, false);
+		box.addEventListener("touchmove", touchHandler, false);
+		box.addEventListener("touchend", touchHandler, false);
+	});
+	
+	}
+	function touchHandler(e){
+  e.preventDefault();
+  var touch = e.touches[0];
+  if(e.type == "touchmove"){
+  /*
+    mouseX=touch.pageX;
+	mouseY=touch.pageY;
+	mouse_status=true;
+	*/
+	}
+	if(e.type == "touchend"){
+	/*
+	mouseX=0;
+	mouseY=0;
+	sendMessage();
+	mouse_status=false;
+	*/
+	}
+}
+	
+	
+	
+	//アニメーション
+	setInterval(function(){
+			//背景の塗りつぶし
+			ctx1.fillStyle="rgba(0,0,0,1)";
+			 
+			ctx1.fillRect(0,0,canvas1.width,canvas1.height);
+			
+			context.font = "6pt Arial";
+			
+			/*
+			if(smartphone==true){
+				context.fillText("smartphone", 5, 40);
+			}else{
+				context.fillText("pc", 5, 40);
+			}
+			
+			*/
+			
+			
+			if(mouse_status==true){
+				sendMessage();
+			}
+			 
+		},33
+	);
+	
+}, false );
+
+
+
+
+  //*/
+  var s = io.connect('http://49.212.231.148:3300/'); //リモート
+  /*/
+  var s = io.connect('http://localhost:3000'); //ローカル
+  //*/
+  var c = '#'+Math.random().toString(16).slice(-6); // 色生成
+  var sz = Math.floor(Math.random() * 20) + 12; // サイズ
+  
+
+  //クライアントからイベント送信（イベント名は自由に設定できます）
+  function sendMessage() {
+    //var msg = $("#message").val(); //取得
+    //$("#message").val(""); //空白にする
+	//var msg="("+mouseX+","+mouseY+")";
+	//ランダムな数を最後につける(負荷検証用)
+    s.emit("C_to_S_message", {value:mouseX,value2:mouseY,color:c,size:sz,ip:ipAddress_}); //サーバへ送信
+	//addMessage(msg,c,sz);
+  }
+  </script>
+  <style>
+    *{
+      font-size:30px;
+      margin:0;
+      padding:0;
+    }
+  </style>
+</head>
+<body>
+<div id="canvasContainer">
+<canvas id="canvas"></canvas>
+</div>
+
+
+<form action="" method="post" onsubmit="return false;">
+<input type="text" class="text" style="width:95%; padding:10px" id="message"/>
+<input type="submit" class="button" style="padding:10px" onclick="sendMessage();" value="送信!!" />
+</form>
+
+  
+</body>
+</html>
+

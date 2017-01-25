@@ -1,0 +1,1001 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>node.js chat</title>
+  <style type="text/css">
+ body	{
+	margin: 0;
+}
+#canvasContainer {
+	width: 1620px;
+	height: 1080px;
+	background: black;
+	margin: 0;
+}
+canvas { top: 0; left: 0;  position: absolute;}
+</style>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="http://code.createjs.com/easeljs-0.5.0.min.js"></script>
+<!--BoxBlurFilter.js-->
+<script type="text/javascript" src="http://jsrun.it/assets/q/l/d/O/qldOs"></script>
+  <script type="text/javascript">
+	var ctx1;
+	var canvas1;
+	var canvas;
+	var context;
+	var val=0;
+	var drawarray = [];
+	var wordcount=0;
+	var touchcount=0;
+	var changeworld=-1;
+	var count=0;
+	var colorstep=5;
+	var colorstepcount=0
+	var rainbow=[256,256,0];
+	var touchcount=0;
+	var titletime=0;
+	var titlecount=0;
+	var mission1a="MISSION 1 QRコードにせつぞくしてオモイをおくろう！",mission1b="",mission1c="",mission1d="";
+	var mission2a="MISSION 2 みんなのオモイをトケイダイにトドけよう！",mission2b="",mission2c="",mission2d="";
+	var rainbowcount=0;
+	var count6=0;
+	var ry=[];
+	var ra=[];
+	for(i=0;i<21;i++){
+		ry[i]=1190-(i*59);
+		ra[i]=1;
+	}
+	var clock=true;
+	var kira=false;
+	var qrword="配布されたプリントにあるQRコードに接続しよう！！";
+	var end=false;
+	var words=[];
+	words[0]="おめでとう！！";
+	words[1]="メリークリスマス！";
+	words[2]="メリクリ〜";
+	words[3]="楽しい！";
+	words[4]="125周年記念";
+	words[5]="やっほー";
+	words[6]="スキー行きたい";
+	words[7]="すげぇ！！";
+	words[8]="時計台きれいです";
+	words[9]="寒い寒い寒い寒い寒い寒い";
+	words[10]="クリスマスっぽい";
+	words[11]="え";
+	words[12]="楽しかった！";
+	words[13]="プロジェクションマッピング最高！！";
+	words[14]="アーメン";
+	words[15]="wwwwwwwwwwwwwwwwwwwwww";
+	words[16]="関学すげぇ";
+	words[17]="うぇーい";
+	words[18]="Merry Christmas!!";
+	words[19]="こんばんは";
+	words[20]="わっほい！";
+	words[21]="レインボー";
+	words[22]="プロジェクションマッピング良かった";
+	words[23]="今日来てよかったです！";
+	words[24]="125周年おめでとうーー";
+	words[25]="やべえええええ";
+	words[26]="何これ";
+	words[27]="テストテストテスト";
+	words[28]="ああああああああああああああああああ";
+	words[29]="打った文字が流れてるよ";
+	words[30]="おつかれさまでしたああああ";
+	
+	
+	
+window.addEventListener( "load", function() {
+	var container = document.getElementById("canvasContainer"),
+	queue = null,
+	wait = 300;
+	
+	
+	var canvas = document.getElementById("canvas");
+	ctx1 = canvas.getContext("2d");
+	var canvas2 = document.getElementById("canvas2");
+	var context = canvas2.getContext("2d"); 
+	
+	var canvas3 = document.getElementById("canvas3");
+	var ctx3 = canvas3.getContext("2d"); 
+	
+	var canvas4 = document.getElementById("canvas4");
+	var ctx4 = canvas4.getContext("2d"); 
+	
+	var canvas5 = document.getElementById("canvas5");
+	var ctx5 = canvas5.getContext("2d"); 
+	
+	//var audio = new Audio("http://karakuri-do.sakura.ne.jp/1.mp3");
+	var audio = new Audio("http://karakuri-do.sakura.ne.jp/125pm/voice1.mp3");
+	var audio2 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/se01.mp3");
+	var audio3 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/se02.mp3");
+	var audio4 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/rhythm1.mp3");
+	audio4.loop = true;
+	var audio5 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/rhythm2.mp3");
+	audio5.loop = true;
+	var audio6 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/type1.mp3");
+	var audio7 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/magic7.mp3");
+	var audio8 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/se03.mp3");
+	var audio9 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/se04.mp3");
+	var audio10 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/se05.mp3");
+	var audio11 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/kirakira.mp3");
+	//audio11.loop = true;
+	var audio12 = new Audio("http://karakuri-do.sakura.ne.jp/125pm/se06.mp3");
+	
+	
+	// ページ読込時にCanvasサイズ設定 
+	setCanvasSize();
+		 
+	// リサイズ時にCanvasサイズを再設定 
+	window.addEventListener("resize", function() {
+	clearTimeout( queue );
+	queue = setTimeout(function() {
+	setCanvasSize();
+	}, wait );
+	}, false );
+	 
+	
+	
+	// Canvasサイズをコンテナの100%に 
+	function setCanvasSize() {
+	canvas.width = 1920;
+	canvas.height = 1080;
+	canvas2.width=1300;
+	canvas2.height=614;
+	canvas3.width=1300;
+	canvas3.height=614;
+	
+	canvas4.width=1300;
+	canvas4.height=614;
+	canvas5.width=1300;
+	canvas5.height=614;
+	}
+	
+	canvas2.onmousedown=function() {
+		
+	};
+	
+	document.onkeydown = function (e){
+	// InternetExplorer 用
+	if (!e)	e = window.event;
+	// 出力テスト
+	//console.log(e.which);
+	//'z'文字転送
+	if(e.which==90){
+		if(changeworld==1){
+			if(wordcount<500){
+				var yyy=Math.floor(Math.random() * 710)+50;
+				if(yyy>=400){yyy+=210;}
+				var r = Math.floor(Math.random() * 155)+100;
+				var g = Math.floor(Math.random() * 155)+100;
+				var b = Math.floor(Math.random() * 155)+100;
+				var c = "#"+r.toString(16)+g.toString(16)+b.toString(16);
+				var s =Math.floor(Math.random() * 29);
+				console.log(s);
+				drawarray.push([words[s],c,Math.floor(Math.random() * 15) + 19,614,yyy]);
+				wordcount+=3;
+				audio.play();
+				audio = new Audio(audio.src);
+			}else{
+				changeworld=2;
+				count=0;
+				drawarray=[];
+				audio4.pause();
+				audio2.play();
+				audio2 = new Audio(audio2.src);
+			}
+		}
+	}
+	//'x'ボタンタッチ
+	if(e.which==88){
+		if(changeworld==5){
+			if(touchcount<2000){
+				touchcount+=8;
+				audio12.play();
+				audio12 = new Audio(audio12.src);
+			}else{
+				changeworld=6;
+				audio5.pause();
+				audio7.play();
+				touchcount=2000;
+			}
+		}
+	}
+	//'c'場面展開
+	if(e.which==67){
+		changeworld++;
+		count=0;
+		//○○voice移動
+		if(changeworld==2){
+			count=0;
+			drawarray=[];
+			audio4.pause();
+			audio2.play();
+			audio2 = new Audio(audio2.src);
+			wordcount=500;
+		}
+		//虹色に光る
+		if(changeworld==3){
+			count=0;
+		}
+		//mission2表示
+		if(changeworld==4){
+			count=0;
+			titlecount=0;titletime=0;
+		}
+		//touchモード
+		if(changeworld==5){
+			sendMessage();
+		}
+		if(changeworld==6){
+			audio5.pause();
+			audio7.play();
+			touchcount=2000;
+		}
+		//touchモード終わり changeworld=6
+		
+	}
+	//'s'
+	if(e.which==83){
+		//send'1111'(=tapモード)
+		sendMessage();
+	}
+	//'p'
+	if(e.which==80){
+		//send'9999'(=voiceモード)
+		sendMessage2();
+		
+	}
+	//'q'
+	if(e.which==81){
+		audio11.pause();
+		end=true;
+		//send'5555'(=アンケートモード)
+		sendMessage3();
+	}
+	
+	
+};
+
+	
+	context.translate(canvas2.width,0);
+	context.rotate((Math.PI / 2)); 
+	ctx3.translate(canvas3.width,0);
+	ctx3.rotate((Math.PI / 2)); 
+	ctx4.translate(canvas3.width,0);
+	ctx4.rotate((Math.PI / 2)); 
+	
+	ctx5.translate(canvas3.width,0);
+	ctx5.rotate((Math.PI / 2)); 
+	
+	//	ctx3.fillStyle="rgba(255,0,0,0.1)";
+	//	ctx3.fillRect(0,0,canvas3.height,canvas3.width);
+	
+	//アニメーション
+	setInterval(function(){
+	
+		//背景の塗りつぶし
+		ctx1.fillStyle="black";
+		ctx1.fillRect(0,0,canvas.width,canvas.height);
+		
+		context.fillStyle="black";
+		context.fillRect(0,0,canvas2.height,canvas2.width);
+		
+		
+		
+		
+		//countに従って虹色の四角形
+		if(changeworld>=5){
+			if(touchcount!=0){
+				rainbowcount=Math.floor(touchcount/100)+1;
+			}
+			context.shadowBlur  = 20;
+			
+			
+			
+			if(count6>85&&count6<=95){ry[20]=10+215*((count6-85)/10);}
+			if(count6>95&&count6<=105){ry[19]=69+156*((count6-95)/10);ra[20]=(105-count6)/10;}
+			if(count6>105&&count6<=115){ry[18]=128+97*((count6-105)/10);ra[19]=(115-count6)/10;}
+			if(count6>115&&count6<=125){ry[17]=187+38*((count6-115)/10);ra[18]=(125-count6)/10;}
+			if(count6>125&&count6<=135){ry[16]=246-21*((count6-125)/10);ra[17]=(135-count6)/10;}
+			if(count6>135&&count6<=145){ry[15]=305-80*((count6-135)/10);ra[16]=(145-count6)/10;}
+			if(count6>145&&count6<=155){ry[14]=364-139*((count6-145)/10);ra[15]=(155-count6)/10;}
+			if(count6>155&&count6<=165){ry[13]=423-198*((count6-155)/10);ra[14]=(165-count6)/10;}
+			if(count6>165&&count6<=175){ry[12]=482-257*((count6-165)/10);ra[13]=(175-count6)/10;}
+			if(count6>175&&count6<=185){ry[11]=541-316*((count6-175)/10);ra[12]=(185-count6)/10;}
+			if(count6>185&&count6<=195){ry[10]=600-375*((count6-185)/10);ra[11]=(195-count6)/10;}
+			if(count6>195&&count6<=205){ry[9]=659-434*((count6-195)/10);ra[10]=(205-count6)/10;}
+			if(count6>205&&count6<=215){ry[8]=718-493*((count6-205)/10);ra[9]=(215-count6)/10;}
+			if(count6>215&&count6<=225){ry[7]=777-552*((count6-215)/10);ra[8]=(225-count6)/10;}
+			if(count6>225&&count6<=235){ry[6]=836-611*((count6-225)/10);ra[7]=(235-count6)/10;}
+			if(count6>235&&count6<=245){ry[5]=895-670*((count6-235)/10);ra[6]=(245-count6)/10;}
+			if(count6>245&&count6<=255){ry[4]=954-729*((count6-245)/10);ra[5]=(255-count6)/10;}
+			if(count6>255&&count6<=265){ry[3]=1013-788*((count6-255)/10);ra[4]=(265-count6)/10;}
+			if(count6>265&&count6<=275){ry[2]=1072-847*((count6-265)/10);ra[3]=(275-count6)/10;}
+			if(count6>275&&count6<=285){ry[1]=1131-906*((count6-275)/10);ra[2]=(285-count6)/10;}
+			if(count6>285&&count6<=295){ry[0]=1190-965*((count6-285)/10);ra[1]=(295-count6)/10;}
+			if(count6>295&&count6<=305){ra[0]=(305-count6)/10;}
+			
+			
+			for(i=0;i<rainbowcount;i++){
+				var rgb = hslToRgb(60+(i*10),100,100);
+				//console.log(rgb.r+","+rgb.g+","+rgb.b);
+				context.fillStyle = "rgba("+rgb.r+","+rgb.g+","+rgb.b+", "+ra[i]+")";
+				context.shadowColor = "rgba("+rgb.r+","+rgb.g+","+rgb.b+", 1)";
+				context.fillRect(130,ry[i],354,49);
+			}
+			context.shadowBlur  = 0; 
+		}
+		
+		if(clock==true){
+		//時計台の円
+		var xx=238;
+		var yy=175;
+		var wid=138;
+		var hei=138;
+		var grd = context.createRadialGradient(xx+(wid/2), yy+(hei/2), 55, xx+(wid/2), yy+(hei/2), 72);
+		if(changeworld<3){
+			grd.addColorStop(0, "yellow");
+		}else{
+			grd.addColorStop(0, "rgba("+(rainbow[0]-1)+","+(rainbow[1]-1)+","+(rainbow[2]-1)+", 1)");
+			//context.fillText(rainbow[0]+","+rainbow[1]+","+rainbow[2]+","+colorstep+","+colorstepcount, 100,100);
+			if(colorstep==0){rainbow[2]+=8;}
+			if(colorstep==1){rainbow[0]-=8;}
+			if(colorstep==2){rainbow[1]+=8;}
+			if(colorstep==3){rainbow[2]-=8;}
+			if(colorstep==4){rainbow[0]+=8;}
+			if(colorstep==5){rainbow[1]-=8;}
+			
+			colorstepcount++;
+			if(colorstepcount%32==0){
+				colorstep++;
+			}
+			if(colorstep>=6){
+				colorstep=0;
+			}
+			if(colorstepcount==150&&changeworld==3){
+				count=0;
+				titlecount=0;titletime=0;
+				changeworld=4;
+			}
+		}
+		
+		grd.addColorStop(1, "rgba(0, 0, 0, 0)");
+		//context.clearRect(xx, yy, wid, hei);
+		context.fillStyle = grd;
+		context.fillRect(xx, yy, wid, hei);
+		
+		//時計台隠す
+		context.fillStyle = "black";
+		context.beginPath();
+		var hide=wordcount/500*180;
+		if(hide==0){
+			hide=0.1;
+		}else if(hide>=180){
+			hide=179.9;
+		}
+		var startAngle = (90-hide) * Math.PI / 180;
+		var endAngle = (90+hide) * Math.PI / 180;
+		context.arc(307, 244, 69, startAngle, endAngle, true);
+		context.fill();
+		
+		
+		}
+		
+		//文字流す
+		if(changeworld==1){
+		for (i = 0; i < drawarray.length; i++) {
+			context.font = drawarray[i][2]+"pt Arial";
+			context.fillStyle = drawarray[i][1];
+			context.fillText(drawarray[i][0], drawarray[i][3], drawarray[i][4]);
+			drawarray[i][3]-=6;
+		}
+		}
+		
+		//出さない部分
+		if(changeworld==1){
+			context.fillStyle="black";
+			context.beginPath();
+			context.moveTo(0,415);
+			context.lineTo(0,680);
+			context.lineTo(307,530); 
+			context.lineTo(614,680);
+			context.lineTo(614,415); 
+			context.closePath(); 
+			context.fill();
+		}
+		
+		//mission1表示
+		if(changeworld==0){
+			titletime++;
+			if(titletime%5==0){
+				if(titlecount>=0&&titlecount<10){
+					mission1b=mission1a.substring(0, titlecount);
+					if(titlecount!=8){
+						audio6.play();
+						audio6 = new Audio(audio6.src);
+					}
+				}else if(titlecount>=12&&titlecount<25){
+					mission1c=mission1a.substring(10, titlecount-2);
+					audio6.play();
+					audio6 = new Audio(audio6.src);
+				}else if(titlecount>=25&&titlecount<34){
+					mission1d=mission1a.substring(22, titlecount-2);
+					audio6.play();
+					audio6 = new Audio(audio6.src);
+				}else if(titlecount==70){
+					changeworld++;
+				}
+				titlecount++;
+			}
+			context.fillStyle = "rgba(255, 255, 255,1)";
+			context.shadowColor = "rgba(255, 255, 255, 1)";  
+			context.shadowBlur  = 20;
+			context.font = "40pt PixelMplus12";
+			context.fillText(mission1b, 190,660);
+			context.font = "30pt PixelMplus12";
+			context.fillText(mission1c, 85,730);
+			context.fillText(mission1d, 125,790);
+			context.shadowBlur  = 0;      //ぼかしを０にする
+		}
+		
+		//mission2表示
+		if(changeworld==4){
+			titletime++;
+			if(titletime%5==0){
+				if(titlecount>=0&&titlecount<10){
+					mission2b=mission2a.substring(0, titlecount);
+					if(titlecount!=8){
+						audio6.play();
+						audio6 = new Audio(audio6.src);
+					}
+				}else if(titlecount>=12&&titlecount<21){
+					mission2c=mission2a.substring(10, titlecount-2);
+					audio6.play();
+					audio6 = new Audio(audio6.src);
+				}else if(titlecount>=21&&titlecount<33){
+					mission2d=mission2a.substring(18, titlecount-2);
+					audio6.play();
+					audio6 = new Audio(audio6.src);
+				}else if(titlecount==70){
+					changeworld++;
+					sendMessage();
+				}
+				titlecount++;
+			}
+			context.fillStyle = "rgba(255, 255, 255,1)";
+			context.shadowColor = "rgba(255, 255, 255, 1)";  
+			context.shadowBlur  = 20;
+			context.font = "40pt PixelMplus12";
+			context.fillText(mission2b, 190,660);
+			context.font = "30pt PixelMplus12";
+			context.fillText(mission2c, 150,730);
+			context.fillText(mission2d, 70,790);
+			context.shadowBlur  = 0;      //ぼかしを０にする
+		}
+		
+		
+		//真ん中のカウント
+		if(changeworld==1){
+			if(count==0){
+				audio4.play();
+				titlecount=0;
+			}
+			if(count<50){
+				context.font = "70pt digital-7mono";
+				var alfa=count/50;
+				context.fillStyle = "rgba(0, 255, 0,"+alfa+")";
+				context.shadowColor = "rgba(0, 255, 0, 1)";  
+				context.shadowBlur  = 20;
+				if(wordcount<10){
+					context.fillText(wordcount, 277,490);
+				}else if(wordcount<100){
+					context.fillText(wordcount, 277-42,490);
+				}else if(wordcount<1000){
+					context.fillText(wordcount, 277-85,490);
+				}else{
+					context.fillText(wordcount, 277-128,490);
+				}
+				context.font = "30pt digital-7mono";
+				context.fillText("voices", 335,490);
+				context.shadowBlur  = 0;      //ぼかしを０にする
+				count++;
+			}else{
+				context.font = "70pt digital-7mono";
+				context.fillStyle = "rgba(0, 255, 0, 1)";
+				context.shadowColor = "rgba(0, 255, 0, 1)";  
+				context.shadowBlur  = 20;
+				if(wordcount<10){
+					context.fillText(wordcount, 277,490);
+				}else if(wordcount<100){
+					context.fillText(wordcount, 235,490);
+				}else if(wordcount<1000){
+					context.fillText(wordcount, 192,490);
+				}else{
+					context.fillText(wordcount, 149,490);
+				}
+				context.font = "30pt digital-7mono";
+				context.fillText("voices", 335,490);
+				
+				context.font = "35pt PixelMplus12";
+				context.fillStyle = "rgba(255, 255, 255, 1)";
+				context.shadowColor = "rgba(255, 255, 255, 1)"; 
+				
+				var qrx=30-(count*2-50);
+				if(qrx<-1200){
+					count=50;
+				}
+				
+				context.fillText(qrword,qrx,1030);
+				context.fillText(qrword,qrx+1200,1030);
+				context.shadowBlur  = 0;      //ぼかしを０にする
+				count++;
+			}
+			
+		}else if(changeworld==2){
+			if(count<100){
+				context.font = "70pt digital-7mono";
+				context.fillStyle = "rgba(0, 255, 0, 1)";
+				context.shadowColor = "rgba(0, 255, 0, 1)";  
+				context.shadowBlur  = 20;
+				context.fillText("500", 192,490-(213/100*count));
+				context.font = "30pt digital-7mono";
+				context.fillText("voices", 335,490-(213/100*count));
+				context.shadowBlur  = 0;      //ぼかしを０にする
+				count++;
+			}else if(count>=100&&count<130){
+				context.font = "70pt digital-7mono";
+				context.fillStyle = "rgba(0, 255, 0, 1)";
+				context.shadowColor = "rgba(0, 255, 0, 1)";  
+				context.shadowBlur  = 20;
+				context.fillText("500", 192,490-213);
+				context.font = "30pt digital-7mono";
+				context.fillText("voices", 335,490-213);
+				context.shadowBlur  = 0;      //ぼかしを０にする
+				count++;
+			}else if(count>=130&&count<180){
+				context.font = "70pt digital-7mono";
+				var alfa=(180-count)/25;
+				context.fillStyle = "rgba(0, 255, 0, "+alfa+")";
+				context.shadowColor = "rgba(0, 255, 0, 1)";  
+				context.shadowBlur  = 20;
+				context.fillText("500", 192,490-213);
+				context.font = "30pt digital-7mono";
+				context.fillText("voices", 335,490-213);
+				context.shadowBlur  = 0;      //ぼかしを０にする
+				count++;
+				if(count==140){
+					audio3.play();
+					audio3 = new Audio(audio3.src);
+				}
+			}else if(count>=180&&count<210){
+				count++;
+				
+			}else if(count>=210){
+				changeworld=3;
+				count=0;
+			}
+		}
+		
+		//console.log(changeworld);
+		//------------mission2の文字------------
+		if(changeworld==5||changeworld==6&&clock==true){
+			if(count==0&&changeworld!=6){
+				audio5.play();
+				//audio5 = new Audio(audio5.src);
+			}
+			if(count<50){
+				context.font = "70pt digital-7mono";
+				var alfa=count/50;
+				context.fillStyle = "rgba(255, 255, 0,"+alfa+")";
+				context.shadowColor = "rgba(255, 255, 0, 1)";  
+				context.shadowBlur  = 20;
+				if(touchcount<10){
+					context.fillText(touchcount, 277,507);
+				}else if(touchcount<100){
+					context.fillText(touchcount, 277-42,507);
+				}else if(touchcount<1000){
+					context.fillText(touchcount, 277-85,507);
+				}else{
+					context.fillText(touchcount, 277-128,507);
+				}
+				context.font = "30pt digital-7mono";
+				context.fillText("touches", 335,507);
+				context.shadowBlur  = 0;      //ぼかしを０にする
+				count++;
+			}else{
+				context.font = "70pt digital-7mono";
+				context.fillStyle = "rgba(255, 255, 0, 1)";
+				context.shadowColor = "rgba(255, 255, 0, 1)";  
+				context.shadowBlur  = 20;
+				if(touchcount<10){
+					context.fillText(touchcount, 277,507);
+				}else if(touchcount<100){
+					context.fillText(touchcount, 277-42,507);
+				}else if(touchcount<1000){
+					context.fillText(touchcount, 277-85,507);
+				}else if(touchcount<10000){
+					context.fillText(touchcount, 277-128,507);
+				}else{
+					context.fillText(touchcount, 277-170,507);
+				}
+				context.font = "30pt digital-7mono";
+				context.fillText("touches", 335,507);
+				context.shadowBlur  = 0;      //ぼかしを０にする
+			}
+		}
+		
+		if(changeworld==6){
+			count6++;
+			if(count6>=85&&count6<295&&count6%10==5){
+				audio8.play();
+				audio8 = new Audio(audio8.src);
+			}
+			if(count6==340){
+				audio9.play();
+				clock=false;
+			}
+			if(count6>=340){
+				context.fillStyle="rgba(255,255,255,"+(370-count6)/30+")";
+				context.fillRect(0,0,canvas2.height,canvas2.width);
+			}
+			
+			if(count6==390){
+				audio10.play();
+				
+				var FPS = 60; // フレームレート
+				var INTERVAL_SEC = 1000 / FPS >> 0; // インターバル時間
+				// -----------------------------------------
+				// クラス定義
+				// -----------------------------------------
+				
+				/**
+				 * パーティクルクラス
+				 * @param {Number} x X座標
+				 * @param {Number} y Y座標
+				 * @param {Number} vx X方向の速さ
+				 * @param {Number} vy Y方向の速さ
+				 * @param {Number} s 重力の適用度
+				 */
+				function Particle(x, y, vx, vy, s){
+				  this.x = x;
+				  this.y = y;
+				  this.vx = vx;
+				  this.vy = vy;
+				  this.s = s;
+				}
+				
+				// -----------------------------------------
+				// 初期化
+				// -----------------------------------------
+				
+				
+				
+				// 変数の初期化
+				var canvasW = canvas3.width;
+				var canvasH = canvas3.height;
+				var pixels = ctx3.getImageData(0, 0, canvasW, canvasH);
+				var particles = [];
+				var gravity = 50 / 1000;
+				
+				var forceMap = document.getElementById("canvas4").getContext("2d");
+				var forcePixels;
+				forceMap.font = "76px 'Arial'";
+				var str = "ANNIVERSARY!!";
+				var tm = forceMap.measureText(str);
+				forceMap.fillStyle = "rgba(255,255,255,0.01)";
+				forceMap.fillText(str, (canvasH - tm.width) / 2, 780);
+				var str2 = "KG 125th";
+				var tm2 = forceMap.measureText(str2);
+				forceMap.fillText(str2, (canvasH - tm2.width) / 2, 495);
+				forcePixels = forceMap.getImageData(0, 0, canvasW, canvasH);
+				
+				// イベントハンドラの登録
+				setInterval(intervalHandler, INTERVAL_SEC);
+				
+				// -----------------------------------------
+				// イベントハンドラ
+				// -----------------------------------------
+				
+				/**
+				 * インターバルハンドラー
+				 */
+				function intervalHandler(){
+				  forceMap.getImage
+				  
+					
+				  ctx4.clearRect (0,0,canvas2.height,canvas2.width);
+					
+					
+				  for (var i = 0; i < particles.length; i++) {
+					var p = particles[i];
+					
+					p.vx -= gravity * p.s;
+					p.vx *= 0.99; //空気抵抗
+					p.vy *= 0.99;
+					d = 1 - (getPixel(p.x, p.y).r / 0xff) * 0.6; // フォースマップに基づいて抵抗値を計算
+					p.vx *= d; // フォースマップで得た抵抗値を反映
+					p.vy *= d;
+					p.x += p.vx; // 速さを位置に反映
+					p.y += p.vy;
+					
+					// 点描
+					var rgb_ = hslToRgb(p.y*(360/614),100,100);
+					setPixel(p.x, p.y, rgb_.r,rgb_.g,rgb_.b);
+					
+					if (p.x < 0) 
+					  particles.splice(i, 1);
+					
+					ctx4.fillStyle = "rgba("+rgb_.r+","+rgb_.g+","+rgb_.b+", 0.5)";
+					/*
+					ctx4.fillStyle = "rgba(255,255,255, 0.3)";
+					ctx4.shadowColor = "rgba(255,255,255, 1)";
+					ctx4.shadowBlur  = 20;
+					*/
+					ctx4.beginPath();
+					ctx4.arc(p.y, 1300-p.x, 4, 0, Math.PI*2, false);
+					ctx4.fill();
+					//ctx4.shadowBlur  = 0;
+					
+					
+				  }
+				  
+				  for (i = 0; i < 3; i++) 
+					emit(1299,Math.random() *614 , Math.random() + 0.5);
+					
+				
+				  
+				  //faidout();
+				  //ctx3.putImageData(pixels, 0, 0);
+				}
+				
+				// -----------------------------------------
+				// いろいろ
+				// -----------------------------------------
+				
+				/**
+				 * パーティクルエミッター
+				 * @param {Number} ex X座標
+				 * @param {Number} ey Y座標
+				 * @param {Number} s 重力の適用度
+				 */
+				function emit(ex, ey, s){
+				  var p = new Particle(ex, ey, 0, 0, s, 0xFFFFFF);
+				  particles.push(p);
+				}
+				
+				/**
+				 * Pixelを打ち込みます
+				 * @param {Number} x X座標
+				 * @param {Number} y Y座標
+				 * @param {uint} r 赤
+				 * @param {uint} g 緑
+				 * @param {uint} b 青
+				 */
+				function setPixel(x, y, r, g, b){
+				  if (x >= 0 && x < canvasW && y >= 0 && y < canvasH) {
+					var idx = ((x | 0) + (y | 0) * canvasW) * 4;
+					pixels.data[idx + 0] = r;
+					pixels.data[idx + 1] = g;
+					pixels.data[idx + 2] = b;
+					pixels.data[idx + 3] = 252;
+				  }
+				}
+				
+				/**
+				 * Pixel値を取得します
+				 * @param {Number} x X座標
+				 * @param {Number} y Y座標
+				 * @return {Object} {r:255, g:255, b:255}
+				 */
+				function getPixel(x, y){
+				  if (!forcePixels) 
+					return {
+					  r: 0,
+					  g: 0,
+					  b: 0
+					};
+				  if (x >= 0 && x < canvasW && y >= 0 && y < canvasH) {
+					var idx = ((x | 0) + (y | 0) * canvasW) * 4;
+					var r = forcePixels.data[idx + 0];
+					var g = forcePixels.data[idx + 1];
+					var b = forcePixels.data[idx + 2];
+				  }
+				  return {
+					r: r,
+					g: g,
+					b: b
+				  };
+				}
+				
+				/**
+				 * フェードアウト
+				 */
+				function faidout(){
+				  for (var i = 3, l = pixels.data.length; i < l; i += 4) {
+					var a = pixels.data[i];
+					if (a < 253) {
+					  if (a < 36) 
+						pixels.data[i] = 0;
+					  else 
+						if (a < 66) {
+						  pixels.data[i] *= 0.985;
+						}
+						else {
+						  pixels.data[i] *= 0.76;
+						}
+					}
+				  }
+				}
+			}
+			if(count6==480){
+				audio11.play();
+			}
+			//console.log(count6);
+		}
+		
+		if(end==true){
+			ctx5.fillStyle="rgba(0,0,0,0.05)";
+			ctx5.fillRect(0,0,canvas2.height,canvas2.width);
+		}
+		
+		
+	},33);
+	
+	
+  //*/
+  var s = io.connect(); //リモート
+  /*/
+  var s = io.connect('http://localhost:3000'); //ローカル
+  //*/
+  //サーバから受け取るイベント
+  s.on("connect", function (data_c) {});  // 接続時
+  s.on("disconnect", function (client) {});  // 切断時
+  
+  s.on("S_to_C_message", function (data) {   //受ける
+	//voice
+	if(data.color!=null){
+		if(changeworld==1){
+			if(wordcount<500){
+				var yyy=Math.floor(Math.random() * 710)+50;
+				if(yyy>=400){yyy+=210;}
+				drawarray.push([data.value,data.color,data.size,614,yyy]);
+				wordcount+=1;
+				audio.play();
+				audio = new Audio(audio.src);
+			}else{
+				changeworld=2;
+				count=0;
+				drawarray=[];
+				audio4.pause();
+				audio2.play();
+				audio2 = new Audio(audio2.src);
+			}
+		}
+	}else{
+	//touch
+		if(changeworld==5){
+			if(touchcount<2000){
+				touchcount+=1;
+				audio12.play();
+				audio12 = new Audio(audio12.src);
+			}else{
+				
+				changeworld=6;
+				audio5.pause();
+				audio7.play();
+				touchcount=2000;
+			}
+		}
+	
+	}
+	
+});
+
+}, false );
+
+
+function countLength(str) { 
+    var r = 0; 
+    for (var i = 0; i < str.length; i++) { 
+        var c = str.charCodeAt(i); 
+        // Shift_JIS: 0x0 ～ 0x80, 0xa0 , 0xa1 ～ 0xdf , 0xfd ～ 0xff 
+        // Unicode : 0x0 ～ 0x80, 0xf8f0, 0xff61 ～ 0xff9f, 0xf8f1 ～ 0xf8f3 
+        if ( (c >= 0x0 && c < 0x81) || (c == 0xf8f0) || (c >= 0xff61 && c < 0xffa0) || (c >= 0xf8f1 && c < 0xf8f4)) { 
+            r += 1; 
+        } else { 
+            r += 2; 
+        } 
+    } 
+    return r; 
+}
+/**
+ * HLS を RGB へ変換します
+ * @param   {Number}  h         hue値        ※ 0～360の数値
+ * @param   {Number}  l         lightness値  ※ 0～1 の数値
+ * @param   {Number}  s         saturation値 ※ 0～1 の数値
+ * @return  {Object}  {r, g, b} ※ r/g/b は 0～255 の数値
+ */
+var hslToRgb = function(hue, saturation, lightness){
+        var h = hue,
+            s = saturation,
+            l = lightness,
+            max = l <= 0.5 ? l * (1 + s) : l * (1 - s) + s,
+            min = 2 * l - max,
+            rgb = {};
+			
+        if (s == 0) {
+            rgb.r = rgb.g = rgb.b = l;
+        } else {
+            var list = {};
+            list['r'] = h >= 240 ? h - 240 : h + 120;
+            list['g'] = h;
+            list['b'] = h < 120 ? h + 240 : h - 120; 
+            for (var key in list) {
+                var val = list[key],
+                    res;
+                switch (true) {
+                    case val < 60:
+                        res = min + (max - min) * val / 60;
+                        break;
+                    case val < 180:
+                        res = max;
+                        break;
+                    case val < 240:
+                        res = min + (max - min) * (240 - val) / 60;
+                        break;
+                    case val < 360:
+                        res = min;
+                        break;
+                }
+                rgb[key] = res;
+            }
+        }
+	  //console.log((rgb.r+10000)+","+(rgb.g+10000)+","+(rgb.b+10000));
+   //return 'rgb(' + Math.round(rgb.r * 255) + ',' + Math.round(rgb.g * 255) + ',' + Math.round(rgb.b * 255) + ')';
+   return {'r': Math.round((rgb.r+10000)/20000 * 255), 'g': Math.round((rgb.g+10000)/20000 * 255), 'b': Math.round((rgb.b+10000)/20000 * 255), 'type': 'RGB'};
+   
+};
+
+var s0 = io.connect('http://49.212.231.148:3330/'); //リモート
+//イベント送信
+function sendMessage() {
+	//console.log(changeworld);
+	s0.emit("C_to_S_message", {value:1111}); //サーバへ送信 tapモードへ
+}
+function sendMessage2() {
+	//console.log(changeworld);
+	s0.emit("C_to_S_message", {value:9999}); //サーバへ送信 voiceモードへ
+}
+function sendMessage3 () {
+	//console.log(changeworld);
+	s0.emit("C_to_S_message", {value:5555}); //サーバへ送信 アンケートモードへ
+}
+
+
+
+
+
+
+
+
+  </script>
+</head>
+<body>
+  
+
+
+<div id="canvasContainer" class="relative">
+<canvas id="canvas"style="top:0px;left:0px;"></canvas>
+<canvas id="canvas2" style="top:233px;left:40px;"></canvas>
+<canvas id="canvas3" style="top:233px;left:40px;"></canvas>
+<canvas id="canvas4" style="top:233px;left:40px;"></canvas>
+<canvas id="canvas5" style="top:233px;left:40px;"></canvas>
+</div>
+
+<img src="http://karakuri-do.sakura.ne.jp/white_.png" name="image_" width="1620" height="1080" style="position:absolute;top:0px;left:0px">
+
+</body>
+</html>
+

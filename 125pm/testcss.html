@@ -1,0 +1,65 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja" dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>position : relative + absolute を使った例｜CSS Lecture</title>
+<style type="text/css">
+
+body	{
+	text-align: center;
+}
+div#wrapper	{
+	width: 500px;
+	height: 800px;
+	background: #ACD;
+	border-right: 1px solid #069;
+	border-left: 1px solid #069;
+	margin: 0 auto;
+}
+p	{
+	width: 200px;
+	border: 1px solid #F00;
+	color: #F00;
+	position: 5px 10px;
+	text-align: center;
+}
+.relative	{
+	position: relative;
+}
+p.absolute-0	{
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+p.absolute-1	{
+	position: absolute;
+	top: 50px;
+	left: 100px;
+}
+p.absolute-2	{
+	position: absolute;
+	top: 0;
+	left: -250px;
+}
+
+</style> 
+</head>
+
+<body>
+<div id="wrapper" class="relative">
+<h1>wrapper</h1>
+
+<p class="absolute-0">top left を0にした場合</p>
+
+<p class="absolute-1">top 50px　left 100px にした場合</p>
+
+<p class="absolute-2">top 0　left -250px にした場合</p>
+
+</div>
+
+</body>
+</html>
+
+
+
